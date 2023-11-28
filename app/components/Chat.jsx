@@ -1,97 +1,104 @@
-"use client"
-import React from 'react';
-import axios from "axios"
-import Arrow from '../../public/assests/arrow.png'
-import Arrow1 from '../../public/assests/arrow1.png'
-import Arrow2 from '../../public/assests/arrow2.png'
-import Image from 'next/image'
-import { useState } from 'react';
-
-
-const  ChatMessage=({ message })=> {
-  const userClass = message.sender === 'user' ? ' mb-4 p-2 bg-[#c1001f] text-white text-xs  rounded-lg max-w-md self-end shadow-lg border border-zinc-400' : 'mb-4 p-2 bg-[#424242] rounded-lg max-w-md shadow-lg border border-zinc-400' ;
- 
-
-  return (
-    <div className={`${userClass}`}>
-     <p className="text-white text-xs">{message.text}</p> 
-    </div>
-  );
-}
-
+"use client";
+import React from "react";
+import axios from "axios";
+import Arrow from "../../public/assests/arrow.png";
+import Aibot from "../../public/assests/Aibot.png";
+import Arrow2 from "../../public/assests/rightArrow.png";
+import User from "../../public/assests/user.png";
+import Microphone from "../../public/assests/Microphone.png";
+import aiProfile from "../../public/assests/aiProfile.png";
+import Image from "next/image";
+import { useState } from "react";
+import ChatMessage from "./ChatMessage";
+import { BotContext } from "../context/Context";
+import { useContext } from "react";
 const ChatInterface = () => {
-
-  const [prompt, setPrompt] = useState("");
-  const [messages, setMessages] = useState([]);
-  const handleSubmit = async () => {
-
-    console.log('in handle submit');
-
-
-    
-      const userMessage = { text: prompt, sender: 'user' };
-      setMessages((prevMessages) => [...prevMessages, userMessage]);
-   
-
-    try {
-  
-      const response = await fetch('http://127.0.0.1:5000/predict',  {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ message:prompt }),
-      }
-      );
-
-      const {answer}=await response.json()
-      console.log(answer.answer)
-      const botMessage = { text: answer.answer, sender: 'bot' };
-      setMessages((prevMessages) => [...prevMessages, botMessage]);
-     
-    } catch (error) {
-      console.error('Error:', error);
-    }
-    setPrompt('');
-  }
+  const {
+    startListening,
+    transcript,
+    messages,
+    setPrompt,
+    prompt,
+    stopListening,
+    listening,
+    modal,
+    username,
+    handlePrompt,
+  } = useContext(BotContext);
 
   return (
-    <div className="bg-black bg-opacity-20 h-[600px] w-[350px] flex flex-col justify-between shadow-lg">
-      {/* <div className="bg-[#c1001f] text-white p-4 shadow-lg">
-        <h1 className="text-xl font-semibold">AI DOCTOR</h1>
-      </div> */}
-      <div className="p-4 flex-1 overflow-y-auto">
-        {/* Chat messages go here */}
-        <div className="mb-4 p-2 bg-[#424242] rounded-lg max-w-md shadow-lg border border-zinc-400 ">
-          <p className="text-white text-xs">Hey! I am your AI doctor at clinica san miguel, ask me anything?</p>
+    <div
+      className={`bg-white h-[530px] w-[361px] rounded-lg flex flex-col justify-between font-poppinsRegular shadow-lg animate__animated 
+        animate__fadeInUp
+        `}
+    >
+      <div className="flex items-center bg-[#D01717] rounded-tl-lg rounded-tr-lg text-white p-4 shadow-lg">
+        <Image src={Aibot} className="mr-1 w-[50px] h-[50px] " />{" "}
+        <h1 className="text-xl ">Clinica San Miguel AI bot</h1>
+      </div>
+      <div className="p-4 flex-1 overflow-y-auto bg-[#fff]">
+        <div className="flex ">
+          <div className="flex items-center w-[15%] flex-col ">
+            {" "}
+            <Image src={aiProfile} className="h-[35px] w-[35px] mr-1 " />
+            <p className="text-[10px]">AI Bot</p>
+          </div>
+          <div className="mb-4 w-[85%]  p-2 bg-[#EBF0F4] rounded-br-[8px] rounded-tr-[8px] rounded-bl-[8px] max-w-md  text-[14px]  ">
+            <p className="text-[#475560] ">
+              Hey {username} ! I am your AI doctor at clinica san miguel, ask me
+              anything?
+            </p>
+          </div>
         </div>
-        <div className="mb-4 p-2 bg-[#c1001f] text-white text-xs  rounded-lg max-w-md self-end shadow-lg border border-zinc-400  ">
-          <p>I have a question about your products.</p>
-        </div>
-        {/* Add more messages here */}
         <div className="chat-window">
-        {messages.map((message, index) => (
-          <ChatMessage key={index} message={message} />
-        ))}
-      </div>
-      </div>
-      <div className="p-4">
-        <div className="flex p-1  bg-[#424242] rounded-lg shadow-md border  h-[40px]">
-          <input
-            type="text"
-            placeholder="What you want to ask?"
-            className="flex-1  p-2 rounded-l-lg text-white outline-none text-xs  bg-[#424242]  placeholder-opacity-100 placeholder-white::placeholder "
-            value={prompt}
-            onChange={(e) => {
-              setPrompt(e.target.value)
-            }}
-          />
-          <button className="bg-[#c1001f] text-white p-2 text-xs rounded-lg shadow-md  items-center flex justify-center cursor-pointer "
-            onClick={() => { handleSubmit() }}
-          >
-            <Image src={Arrow2} height={20} width={20} />
-          </button>
+          {messages.map((message, index) => (
+            <ChatMessage key={index} message={message} />
+          ))}
         </div>
+      </div>
+
+      {modal === "message" && (
+        <div className=" bg-[#fff]  ">
+          <div className="flex items-center p-1 border-black border bg-[#fff] rounded-[4px] shadow-md  w-[100%]  h-[40px]">
+            <input
+              type="text"
+              placeholder="Type Message"
+              className="flex-1  p-2 rounded-l-lg text-[#475560] outline-none text-xs  bg-[#fff] text-[14px]  placeholder-opacity-100 placeholder-white::placeholder "
+              value={prompt}
+              onChange={(e) => {
+                setPrompt(e.target.value);
+              }}
+            />
+            <button
+              className=" "
+              onClick={() => {
+                handlePrompt();
+              }}
+            >
+              <Image src={Arrow2} height={40} width={40} />
+            </button>
+          </div>
+        </div>
+      )}
+      {modal === "voice" && (
+        <div className="bg-white flex flex-col items-center justify-center">
+          <button
+            className=" text-white p-2  text-xs rounded-lg  items-center flex justify-center cursor-pointer "
+            onTouchStart={startListening}
+            onMouseDown={startListening}
+            onTouchEnd={stopListening}
+            onMouseUp={stopListening}
+          >
+            <Image src={Microphone} height={50} width={50} />
+          </button>
+          <p>{listening ? "Stop Listening" : "Start Listening"}</p>
+        </div>
+      )}
+      {modal === "voice" && (
+        <p className="text-black text-xs bg-white text-center"> {transcript}</p>
+      )}
+      <div className="flex items-center justify-center rounded-bl-lg rounded-br-lg py-1 font-bold text-black  bg-[#EBF0F4] text-[11px] ">
+        Powered by MyclinicMD
       </div>
     </div>
   );
