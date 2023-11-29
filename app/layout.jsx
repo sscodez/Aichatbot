@@ -1,3 +1,4 @@
+import "regenerator-runtime/runtime";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import BotProvider from "./context/Context";
@@ -10,10 +11,8 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <BotProvider>
-        <body className={inter.className}>{children}</body>
-      </BotProvider>
-    </html>
+    <BotProvider>
+      <body className={inter.className}>{children}</body>
+    </BotProvider>
   );
 }

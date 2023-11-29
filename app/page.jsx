@@ -1,4 +1,5 @@
 "use client";
+import "regenerator-runtime/runtime";
 import Image from "next/image";
 import { useState } from "react";
 import ChatInterface from "./components/Chat";
